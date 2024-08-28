@@ -31,6 +31,24 @@ read_files <- function(file_names) {
 }
 ```
 
+
+```{r}
+# Define parameters:
+file_names <- c("RioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
+
+parameters<-c("Sample_ID","Sample_Date","NO3-N", "K")
+
+start_year <- 1989#-01-01"
+end_year <- 1994#-01-01"
+
+
+
+#Running Functions
+read_files(file_names)
+
+```
+
+
 ```{r}
 #Data Cleaning Function
 #I still need to get the function to work! it can still run without the function
@@ -39,14 +57,13 @@ combined_df<-NULL
 variables <- ls(pattern = "^data_")
 
 for (j in seq_along(variables)) {
-    # Get the data frame associated with the current variable name
-    current_data <- get(variables[j])
-    print(current_data)
-    # Select the desired columns (from parameters list)
-    selected_col <- current_data %>% 
-      select(parameters)
-    # Perform a bind join 
-    combined_df <- bind_rows(selected_col, combined_df)
+  # Get the data frame associated with the current variable name
+  current_data <- get(variables[j])
+  # Select the desired columns (from parameters list)
+  selected_col <- current_data %>% 
+    select(parameters)
+  # Perform a bind join 
+  combined_df <- bind_rows(selected_col, combined_df)
     }
 
 #}
@@ -55,7 +72,7 @@ for (j in seq_along(variables)) {
 ```{r}
 #Creating Plotting Function
 
-plotting_function<-function(start_year,end_year){
+#plotting_function<-function(start_year,end_year){
 
 # Filter the data by the specified year range
 filtered_df <- combined_df %>%
@@ -63,27 +80,12 @@ filtered_df <- combined_df %>%
 
 ggplot(data=filtered_df, aes(x=Sample_Date, y = K)) +geom_point(aes(color=Sample_ID))+ theme_minimal()
 
-}
+#}
 ```
-
 
 ```{r}
-# Define parameters:
-file_names <- c("rioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
-
-parameters<-c("Sample_ID","Sample_Date","NO3-N", "K")
-
-start_year <- 1989#-01-01"
-end_year <- 1994#-01-01"
-
-# Get the list of all variables in the environment that start with "data_"
-variables <- ls(pattern = "^data_")
-
-
-#Running Functions
-read_files(file_names)
-cleaning_function(parameters)
-plotting_function(combined_df,start_year,end_year)
+#will merge these functions above once I get them to work
+#cleaning_function(parameters) #still working on this function, can run the for-loops above
+#plotting_function(combined_df,start_year,end_year)
 ```
-
 
