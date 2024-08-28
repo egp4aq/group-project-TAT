@@ -56,7 +56,9 @@ all_sites_clean <- all_sites_df %>%
 ```{r}
 # select columns we're interested in
 all_sites_clean <- all_sites_clean %>%
-  select(sample_id, sample_date, k, no3_n)
+  select(sample_id, sample_date, k, no3_n) %>%
+  mutate(k = as.numeric(k), na.rm=TRUE) %>%
+  mutate(no3_n = as.numeric(no3_n), na.rm=TRUE)
 ```
 
 ## Data Visualization
@@ -68,11 +70,11 @@ all_sites_clean <- all_sites_clean %>%
 
 # plot for potassium
 p1 <- ggplot(all_sites_clean) +
-  geom_point(aes(sample_date, k))
+  geom_line(aes(sample_date, k, color = sample_id))
 
 # plot for nitrate
 p2 <- ggplot(all_sites_clean) +
-  geom_point(aes(sample_date, no3_n))
+  geom_line(aes(sample_date, no3_n, color = sample_id))
 
 # patchwork of both plots
 p1/p2
