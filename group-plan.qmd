@@ -70,14 +70,24 @@ all_sites_clean <- all_sites_clean %>%
 
 # plot for potassium
 p1 <- ggplot(all_sites_clean) +
-  geom_line(aes(sample_date, k, color = sample_id))
+  geom_line(aes(sample_date, k, color = sample_id)) +
+  labs(x = "Year",
+       y = "Potassium (mg/l)") +
+  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
+                    name = "Location: ", 
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3"))
 
 # plot for nitrate
 p2 <- ggplot(all_sites_clean) +
-  geom_line(aes(sample_date, no3_n, color = sample_id))
+  geom_line(aes(sample_date, no3_n, color = sample_id)) +
+  labs(x = "Year",
+       y = "Nitrate (ug/l)") +
+  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
+                    name = "Location: ", 
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3"))
 
 # patchwork of both plots
-p1/p2
+p3 <- p1/p2
 ```
 
 
