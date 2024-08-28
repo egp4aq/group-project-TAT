@@ -14,6 +14,7 @@ library(here)
 library(janitor)
 library(dplyr)
 library(lubridate)
+library(patchwork)
 ```
 
 ## Data Cleaning
@@ -21,16 +22,16 @@ library(lubridate)
 # read in raw data & write -999 values as NA's
 
 # Puente Roto Mameyes
-PRM <- read_csv(here("RioMameyesPuenteRoto.csv"), na = "-999")
+PRM <- read_csv(here("data", "RioMameyesPuenteRoto.csv"), na = "-999")
 
 # Quebrada one-Bisley 
-BQ1 <- read_csv(here("QuebradaCuenca1-Bisley.csv"), na = "-999")
+BQ1 <- read_csv(here("data", "QuebradaCuenca1-Bisley.csv"), na = "-999")
 
 # Quebrada two-Bisley 
-BQ2 <- read_csv(here("QuebradaCuenca2-Bisley.csv"), na = "-999")
+BQ2 <- read_csv(here("data", "QuebradaCuenca2-Bisley.csv"), na = "-999")
 
 # Quebrada three-Bisley 
-BQ3 <- read_csv(here("QuebradaCuenca3-Bisley.csv"), na = "-999")
+BQ3 <- read_csv(here("data", "QuebradaCuenca3-Bisley.csv"), na = "-999")
 ```
 
 ```{r}
@@ -61,14 +62,22 @@ all_sites_clean <- all_sites_clean %>%
 ## Data Visualization
 ```{r}
 # initial visualization in ggplot
-ggplot(data = all_sites_clean, aes(x = sample_date, y = k)) +
-  geom_point(aes(color = sample_id)) +
-  scale_y_discrete(limits = seq(from = 0.2, to = 1.8, by = 0.2))
+# ggplot(all_sites_clean, aes(x = sample_date, y = k)) +
+#   geom_point(aes(color = sample_id)) +
+#   scale_y_discrete(limits = seq(from = 0.2, to = 1.8, by = 0.2))
+
+# plot for potassium
+p1 <- ggplot(all_sites_clean) +
+  geom_point(aes(sample_date, k))
+
+# plot for nitrate
+p2 <- ggplot(all_sites_clean) +
+  geom_point(aes(sample_date, no3_n))
+
+# patchwork of both plots
+p1/p2
 ```
 
-```{r}
-
-```
 
 ## Question Creation / Analysis
 ```{r}
