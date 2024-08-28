@@ -55,7 +55,7 @@ for (j in seq_along(variables)) {
 ```{r}
 #Creating Plotting Function
 
-plotting_function<-function(start_year,end_year){
+#plotting_function<-function(start_year,end_year){
 
 # Filter the data by the specified year range
 filtered_df <- combined_df %>%
@@ -69,7 +69,7 @@ ggplot(data=filtered_df, aes(x=Sample_Date, y = K)) +geom_point(aes(color=Sample
 
 ```{r}
 # Define parameters:
-file_names <- c("rioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
+file_names <- c("RioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
 
 parameters<-c("Sample_ID","Sample_Date","NO3-N", "K")
 
