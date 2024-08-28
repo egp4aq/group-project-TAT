@@ -1,0 +1,78 @@
+---
+title: "Group Plan"
+author: "Tropical Aqua Titans"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+# load libraries
+library(tidyverse)
+library(here)
+library(janitor)
+library(dplyr)
+library(lubridate)
+```
+
+## Data Cleaning
+```{r}
+# read in raw data & write -999 values as NA's
+
+# Puente Roto Mameyes
+PRM <- read_csv(here("RioMameyesPuenteRoto.csv"), na = "-999")
+
+# Quebrada one-Bisley 
+BQ1 <- read_csv(here("QuebradaCuenca1-Bisley.csv"), na = "-999")
+
+# Quebrada two-Bisley 
+BQ2 <- read_csv(here("QuebradaCuenca2-Bisley.csv"), na = "-999")
+
+# Quebrada three-Bisley 
+BQ3 <- read_csv(here("QuebradaCuenca3-Bisley.csv"), na = "-999")
+```
+
+```{r}
+# create a mega data set with each site
+all_sites_df <- full_join(PRM, BQ1) %>%
+  full_join(BQ2) %>%
+  full_join(BQ3)
+```
+
+```{r}
+# clean column names
+all_sites_df <- clean_names(all_sites_df)
+
+# year(all_sites_df$sample_date)
+# making sure date column is in correct format
+
+# truncate date columns
+all_sites_clean <- all_sites_df %>%
+  filter(year(sample_date) > 1988 & year(sample_date) < 1995)
+```
+
+```{r}
+# select columns we're interested in
+all_sites_clean <- all_sites_clean %>%
+  select(sample_id, sample_date, k, no3_n)
+```
+
+## Data Visualization
+```{r}
+# initial visualization in ggplot
+ggplot(data = all_sites_clean, aes(x = sample_date, y = k)) +
+  geom_point(aes(color = sample_id)) +
+  scale_y_discrete(limits = seq(from = 0.2, to = 1.8, by = 0.2))
+```
+
+```{r}
+
+```
+
+## Question Creation / Analysis
+```{r}
+
+```
+
+
