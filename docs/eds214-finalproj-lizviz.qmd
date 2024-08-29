@@ -1,0 +1,100 @@
+---
+title: "Group Plan"
+author: "Tropical Aqua Titans"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+# load libraries
+library(tidyverse)
+library(here)
+library(janitor)
+library(dplyr)
+library(lubridate)
+library(patchwork)
+```
+
+## Data Cleaning
+```{r}
+# read in raw data & write -999 values as NA's
+
+# Puente Roto Mameyes
+PRM <- read_csv(here("data", "RioMameyesPuenteRoto.csv"), na = "-999")
+
+# Quebrada one-Bisley 
+BQ1 <- read_csv(here("data", "QuebradaCuenca1-Bisley.csv"), na = "-999")
+
+# Quebrada two-Bisley 
+BQ2 <- read_csv(here("data", "QuebradaCuenca2-Bisley.csv"), na = "-999")
+
+# Quebrada three-Bisley 
+BQ3 <- read_csv(here("data", "QuebradaCuenca3-Bisley.csv"), na = "-999")
+```
+
+```{r}
+# create a mega data set with each site
+all_sites_df <- full_join(PRM, BQ1) %>%
+  full_join(BQ2) %>%
+  full_join(BQ3)
+```
+
+```{r}
+# clean column names
+all_sites_df <- clean_names(all_sites_df)
+
+# year(all_sites_df$sample_date)
+# making sure date column is in correct format
+
+# truncate date columns
+all_sites_clean <- all_sites_df %>%
+  filter(year(sample_date) > 1988 & year(sample_date) < 1995)
+```
+
+```{r}
+# select columns we're interested in
+all_sites_clean <- all_sites_clean %>%
+  select(sample_id, sample_date, k, no3_n) %>%
+  mutate(k = as.numeric(k), na.rm=TRUE) %>%
+  mutate(no3_n = as.numeric(no3_n), na.rm=TRUE)
+```
+
+## Data Visualization
+```{r}
+# initial visualization in ggplot
+# ggplot(all_sites_clean, aes(x = sample_date, y = k)) +
+#   geom_point(aes(color = sample_id)) +
+#   scale_y_discrete(limits = seq(from = 0.2, to = 1.8, by = 0.2))
+
+# plot for potassium
+p1 <- ggplot(all_sites_clean) +
+  geom_line(aes(sample_date, k, color = sample_id)) +
+  labs(x = "Year",
+       y = "Potassium (mg/l)") +
+  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
+                    name = "Location: ", 
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+  geom_vline(xintercept = as.numeric(all_sites_clean$sample_date[16]), color = "black", linetype = "dashed") +
+  theme_minimal()
+
+# plot for nitrate
+p2 <- ggplot(all_sites_clean) +
+  geom_line(aes(sample_date, no3_n, color = sample_id)) +
+  labs(x = "Year",
+       y = "Nitrate (ug/l)") +
+  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
+                    name = "Location: ", 
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+  geom_vline(xintercept = as.numeric(all_sites_clean$sample_date[16]), color = "black", linetype = "dashed") +
+  theme_minimal()
+
+# patchwork of both plots
+p3 <- p1/p2
+p3 +
+  plot_annotation(title = "Potassium & Nitrate in stream water from the Luquillo Mountains") +
+  plot_layout(guides = "collect")
+```
+
+
