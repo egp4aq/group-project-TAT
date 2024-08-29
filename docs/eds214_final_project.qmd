@@ -5,16 +5,22 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 rm(list=ls())
-#Loading Libraries
+```
+
+```{r, message=FALSE, warning=FALSE}
+### **Loading Libraries**
 library(here)
 library(janitor)
 library(tidyverse)
 library(readr)
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
+### **Read_files Function**
+
+#Import data from multiple files into R
 read_files <- function(file_names) {
   # Loop through the file names and read the CSV files into dynamically named variables
   for (i in seq_along(file_names)) {
@@ -29,10 +35,13 @@ read_files <- function(file_names) {
 }
 ```
 
-```{r}
-#Data Cleaning Function
-combined_df<-NULL
+```{r, message=FALSE, warning=FALSE}
+### **Data Cleaning Function**
 
+#Process and merge data from all files
+
+#Iterating through each single file to select the defined parameters and join all files
+combined_df<-NULL
 cleaning_function<-function(parameters){
   for (j in seq_along(variables)) {
     # Get the data frame associated with the current variable name
@@ -42,41 +51,51 @@ cleaning_function<-function(parameters){
       select(parameters)
     # Perform a bind join 
     combined_df <- bind_rows(selected_col, combined_df)#bind_rows
-    print(combined_df)
     }
   return(combined_df)
 }
 ```
 
+```{r, message=FALSE, warning=FALSE}
+### **Defining the Parameters**
 
-```{r}
-#Definig parameters
+#Link to where the data resides
 pathway <- "/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data"
-file_names <- c("RioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
-parameters<-c("Sample_ID","Sample_Date","NO3-N", "K")
+
+#Names of files
+file_names <- c("RioMameyesPuenteRoto.csv", 
+                "QuebradaCuenca1-Bisley.csv",
+                "QuebradaCuenca2-Bisley.csv",
+                "QuebradaCuenca3-Bisley.csv")
+
+#Define Water Quality Parameters
+parameters<-c("Sample_ID",
+              "Sample_Date",
+              "NO3-N",
+              "K")
+
+#Date Range
 start_year <- 1989
 end_year <- 1994
 ```
 
-```{r}
-#Running the functions
+```{r, message=FALSE, warning=FALSE}
+### **Running the Functions**
+
 read_files(file_names)
 variables <- ls(pattern = "^data_")
 combined_df<-cleaning_function(parameters)
-
 ```
 
-```{r}
-#[INSERT GRAPH FUNCTION HERE]
+```{r, message=FALSE, warning=FALSE}
+## [INSERT GRAPH FUNCTION HERE]
 
 #plotting_function<-function(start_year,end_year){
 
 # Filter the data by the specified year range
 filtered_df <- combined_df %>%
   filter(between(lubridate::year(Sample_Date), start_year, end_year))
-
+# Plotting the selected data
 ggplot(data=filtered_df, aes(x=Sample_Date, y = K)) +geom_point(aes(color=Sample_ID))+ theme_minimal()
 #}
 ```
-
-
