@@ -6,7 +6,7 @@
 ### Carmen Hoyt
 
 ## Goal/Purpose:
-### 1. This project looks at stream water quality affected by Hurricane Luquillo in 1989 in 4 watersheds in Puerto Rico:
+### 1. This project looks at stream water quality affected by Hurricane Hugo in 1989 in 4 watersheds in Puerto Rico:
 #### - Puente Roto Mameyes (PRM)
 #### - Bisley Quebradas (BQ1)
 #### - Bisley Quebradas (BQ2) 
