@@ -22,55 +22,52 @@ read_files <- function(file_names) {
     var_name <- paste0("data_", i)
     
     # Read the CSV file
-    file_data <- read_csv(here("data", file_names[i]), na = c("-999", ""))
-    
+    file_data <- read_csv(here(pathway, file_names[i]), na = c("-999", ""))
     # Assign the data frame to a variable with the constructed name
     assign(var_name, file_data, envir = .GlobalEnv)
   }
+}
+```
 
+```{r}
+#Data Cleaning Function
+combined_df<-NULL
+
+cleaning_function<-function(parameters){
+  for (j in seq_along(variables)) {
+    # Get the data frame associated with the current variable name
+    current_data <- get(variables[j])
+    # Select the desired columns (from parameters list)
+    selected_col <- current_data %>% 
+      select(parameters)
+    # Perform a bind join 
+    combined_df <- bind_rows(selected_col, combined_df)#bind_rows
+    print(combined_df)
+    }
+  return(combined_df)
 }
 ```
 
 
 ```{r}
-# Define parameters:
+#Definig parameters
+pathway <- "/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data"
 file_names <- c("RioMameyesPuenteRoto.csv", "QuebradaCuenca1-Bisley.csv","QuebradaCuenca2-Bisley.csv","QuebradaCuenca3-Bisley.csv")
-
 parameters<-c("Sample_ID","Sample_Date","NO3-N", "K")
+start_year <- 1989
+end_year <- 1994
+```
 
-start_year <- 1989#-01-01"
-end_year <- 1994#-01-01"
-
-
-
-#Running Functions
+```{r}
+#Running the functions
 read_files(file_names)
-
-```
-
-
-```{r}
-#Data Cleaning Function
-#I still need to get the function to work! it can still run without the function
-#cleaning_function<-function(parameters){
-combined_df<-NULL
 variables <- ls(pattern = "^data_")
+combined_df<-cleaning_function(parameters)
 
-for (j in seq_along(variables)) {
-  # Get the data frame associated with the current variable name
-  current_data <- get(variables[j])
-  # Select the desired columns (from parameters list)
-  selected_col <- current_data %>% 
-    select(parameters)
-  # Perform a bind join 
-  combined_df <- bind_rows(selected_col, combined_df)
-    }
-
-#}
 ```
 
 ```{r}
-#Creating Plotting Function
+#[INSERT GRAPH FUNCTION HERE]
 
 #plotting_function<-function(start_year,end_year){
 
@@ -79,13 +76,7 @@ filtered_df <- combined_df %>%
   filter(between(lubridate::year(Sample_Date), start_year, end_year))
 
 ggplot(data=filtered_df, aes(x=Sample_Date, y = K)) +geom_point(aes(color=Sample_ID))+ theme_minimal()
-
 #}
 ```
 
-```{r}
-#will merge these functions above once I get them to work
-#cleaning_function(parameters) #still working on this function, can run the for-loops above
-#plotting_function(combined_df,start_year,end_year)
-```
 
