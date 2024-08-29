@@ -75,7 +75,8 @@ p1 <- ggplot(all_sites_clean) +
        y = "Potassium (mg/l)") +
   scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
                     name = "Location: ", 
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3"))
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+  geom_vline(xintercept = as.numeric(all_sites_clean$sample_date[16]), color = "black", linetype = "dashed")
 
 # plot for nitrate
 p2 <- ggplot(all_sites_clean) +
@@ -84,11 +85,14 @@ p2 <- ggplot(all_sites_clean) +
        y = "Nitrate (ug/l)") +
   scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
                     name = "Location: ", 
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3"))
+                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+  geom_vline(xintercept = as.numeric(all_sites_clean$sample_date[16]), color = "black", linetype = "dashed")
 
 # patchwork of both plots
 p3 <- p1/p2
-p3
+p3 +
+  plot_annotation(title = "Potassium & Nitrate in stream water from the Luquillo Mountains") +
+  plot_layout(guides = "collect")
 ```
 
 
