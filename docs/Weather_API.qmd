@@ -119,6 +119,7 @@ url <- paste0("https://archive-api.open-meteo.com/v1/era5?latitude=", latitude,
               "&end_date=", end_date,
               "&timezone=America%2FNew_York")  # Adjust timezone as needed
 
+
 # Make the API request
 response <- GET(url)
 weather_data <- fromJSON(content(response, "text"))
