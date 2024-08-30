@@ -1,3 +1,8 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 data|stem|6afcb05a96a54f6c|43fae4011a0626f4|136bf5e07fbd9b1c|1588979285||t19965.069821s|d07e2e962de596ec|1750|rds|local|vector|||0.009||
+file_names|object|959ffb9edcc55966|||||||||||||||
+files|stem|e0b0f51a7ae32ae9|138b0a82257e8485|c849386ea497132d|-86421757||t19965.7781456565s|4bab66ba4bee4440|108|rds|local|vector|||0.573||
 model|stem|adfd07a8b0a5a5ed|ae83bc723fe2997c|326e0a6129599004|1816327236||t19965.0698212315s|1254f8a9a0ffbd1f|107|rds|local|vector|||0.002||
+pathway|object|cd8433fe518adc0d|||||||||||||||
+read_files|function|869875b5746e8d94|||||||||||||||
+target1|stem|3fe873ceaa51890e|c19a60016c60c0bd|92d5a9a43c77c436|-1205989743||t19965.7783882755s|a1c456b03adbfbf8|44|rds|local|vector|||0.542||

@@ -1,5 +1,5 @@
 ---
-title: "section2"
+title: "Weather API"
 format: html
 editor: visual
 editor_options: 
@@ -10,8 +10,8 @@ editor_options:
 rm(list=ls())
 ```
 
-```{r, message=FALSE, warning=FALSE}
 ### **Loading Libraries**
+```{r, message=FALSE, warning=FALSE}
 library(here)
 library(janitor)
 library(tidyverse)
@@ -23,7 +23,6 @@ library(jsonlite)
 ```
 
 ### **Read_files Function**
-
 ```{r, message=FALSE, warning=FALSE}
 #Import data from multiple files into R
 read_files <- function(file_names) {
@@ -161,6 +160,6 @@ p2 <- ggplot(df_weather,aes(date, precipitation_sum)) +
 p3 <- p1/p2
 
 p3 +
-  plot_annotation(title = "Effect of Hurricane Hugo on Stream Water Potassium and Nitrate\n in the Luquillo Mountains") + theme(plot.title=element_text(hjust=0.5)) +
+  plot_annotation(title = "Effect of Precipitation on Stream Water\n in the Luquillo Mountains") + theme(plot.title=element_text(hjust=0.5)) +
   plot_layout(guides = "collect")
 ```
