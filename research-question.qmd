@@ -1,22 +1,18 @@
 ---
-title: "Version 2"
+title: "Research Question"
 format: html
 editor: visual
 editor_options: 
   chunk_output_type: console
 ---
 
-title: "final_proj"
-format: html
-editor_options:
-  chunk_output_type: console
----
 ```{r, message=FALSE, warning=FALSE}
-rm(list=ls())
+# clear environment
+rm(list = ls())
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-### **Loading Libraries**
+# load packages
 library(here)
 library(janitor)
 library(tidyverse)
@@ -24,121 +20,138 @@ library(readr)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-### **Read_files Function**
-#Import data from multiple files into R
+### **read_files function**
+# import data from multiple files into R
 read_files <- function(file_names) {
-  # Loop through the file names and read the CSV files into dynamically named variables
+  # loop through the file names and read the csv files into dynamically named variables
   for (i in seq_along(file_names)) {
-    # Construct the dynamic name for the variable
+    # construct the dynamic name for the variable
     var_name <- paste0("data_", i)
-    # Read the CSV file
+    # read the csv file
     file_data <- read_csv(here(pathway, file_names[i]), na = c("-999", ""))
-    # Assign the data frame to a variable with the constructed name
+    # assign the data frame to a variable with the constructed name
     assign(var_name, file_data, envir = .GlobalEnv)
   }
 }
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-### **Data Cleaning Function**
-#Process and merge data from all files
-#Iterating through each single file to select the defined parameters and join all files
-combined_df<-NULL
-cleaning_function<-function(parameters){
+### **data cleaning function**
+# process and merge data from all files
+# iterating through each single file to select the defined parameters and join all files
+combined_df <- NULL
+cleaning_function <- function(parameters){
   for (j in seq_along(variables)) {
-    # Get the data frame associated with the current variable name
+    # get the data frame associated with the current variable name
     current_data <- get(variables[j])
-    # Select the desired columns (from parameters list)
+    # select the desired columns (from parameters list)
     selected_col <- current_data %>%
       select(parameters)
-    # Perform a bind join
-    combined_df <- bind_rows(selected_col, combined_df)#bind_rows
+    # perform a bind join
+    combined_df <- bind_rows(selected_col, combined_df) # bind_rows
     }
   return(combined_df)
 }
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-### **Defining the Parameters**
-#Link to where the data resides
+### **defining the parameters**
+# create a pathway from files to workbench
 pathway <- "/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data"
-#Names of files
+# names of files
 file_names <- c("RioMameyesPuenteRoto.csv",
                 "QuebradaCuenca1-Bisley.csv",
                 "QuebradaCuenca2-Bisley.csv",
                 "QuebradaCuenca3-Bisley.csv")
-#Define Water Quality Parameters
-parameters<-c("Sample_ID",
+# define water quality parameters
+parameters <- c("Sample_ID",
               "Sample_Date",
               "NO3-N",
               "K",
               "TSS")
-#Date Range
+# date range
 start_year <- 1989
 end_year <- 1994
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-### **Running the Functions**
+### **running the functions**
 read_files(file_names)
 variables <- ls(pattern = "^data_")
-combined_df<-cleaning_function(parameters)
-combined_df <- clean_names(combined_df)
+combined_df <- cleaning_function(parameters)
+combined_df <- clean_names(combined_df) # convert to lower snake case
 ```
 
 ```{r}
+# select for time frame (1989 - 1994)
 filtered_df <- combined_df %>%
-  filter(between(lubridate::year(sample_date), start_year, end_year)) %>%
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  mutate(tss = as.numeric(tss))
-
+  filter(between(lubridate::year(sample_date), start_year, end_year)) %>% # change chr. to date
+  mutate(k = as.numeric(k)) %>% # change chr. to numeric
+  mutate(no3_n = as.numeric(no3_n)) %>% # change chr. to numeric
+  mutate(tss = as.numeric(tss)) # change chr. to numeric
 ```
 
 ```{r}
-p1 <- ggplot(data = filtered_df, aes(x = sample_date, y = tss, color = sample_id)) +
+# plot tss for timeframe (1989 - 1994)
+p1 <- ggplot(data = filtered_df, aes(x = sample_date, 
+                                     y = tss, 
+                                     color = sample_id)) +
   geom_line() +
-  scale_y_continuous(limits = c(from = 0, to = 2000, by = 200)) +
-  labs(x = "Date", y = "Total Suspended Solids (mg/L)") +
+  scale_y_continuous(limits = c(from = 0, 
+                                to = 2000, 
+                                by = 200)) +
+  labs(x = "Date", 
+       y = "Total Suspended Solids (mg/L)") +
   facet_wrap(~ sample_id) +
   scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
-                    name = "Location: ",
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+                     name = "Location: ",
+                     labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
   theme_classic() +
-  geom_vline(xintercept = as.numeric(filtered_df$sample_date[39]), color = "black", linetype = "dashed")
+  geom_vline(xintercept = as.numeric(filtered_df$sample_date[39]), 
+             color = "black",
+             linetype = "dashed")
+# call the plot
+p1
 ```
 
 
 ```{r}
-# tss for 2015 - 2018
-
-#new date range
+# new date range for analysis
 start_2015 <- 2015
 end_2018 <- 2018
 ```
 
 ```{r}
+# select for time frame (2015 - 2018)
 df_2015_2018 <- combined_df %>%
-  filter(between(lubridate::year(sample_date), start_2015, end_2018)) %>%
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  mutate(tss = as.numeric(tss))
+  filter(between(lubridate::year(sample_date), start_2015, end_2018)) %>% # change chr. to date
+  mutate(k = as.numeric(k)) %>% # change chr. to numeric
+  mutate(no3_n = as.numeric(no3_n)) %>% # change chr. to numeric
+  mutate(tss = as.numeric(tss)) # change chr. to numeric
 ```
 
 ```{r}
-p2 <- ggplot(data = df_2015_2018, aes(x = sample_date, y = tss, color = sample_id)) +
+# plot tss for timeframe (2015 - 2018)
+p2 <- ggplot(data = df_2015_2018, aes(x = sample_date, 
+                                      y = tss, 
+                                      color = sample_id)) +
   geom_line() +
   scale_y_continuous(limits = c(from = 0, to = 300, by = 100)) +
-  labs(x = "Date", y = "Total Suspended Solids (mg/L)") +
+  labs(x = "Date", 
+       y = "Total Suspended Solids (mg/L)") +
   facet_wrap(~ sample_id) +
   scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
-                    name = "Location: ",
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
+                     name = "Location: ",
+                     labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
   theme_classic() +
-  geom_vline(xintercept = as.numeric(df_2015_2018$sample_date[142]), color = "black", linetype = "dashed")
+  geom_vline(xintercept = as.numeric(df_2015_2018$sample_date[142]), 
+             color = "black", linetype = "dashed")
+# call the plot
+p2
 ```
 
 ```{r}
+# save plots
 ggsave(here("p2.jpeg"))
 ggsave(here("p1.jpeg"))
 ```
