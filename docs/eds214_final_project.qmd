@@ -1,5 +1,5 @@
 ---
-title: "final_proj"
+title: "EDS214-FinalProject-TropicalAquaTitants"
 format: html
 editor_options: 
   chunk_output_type: console
@@ -9,8 +9,8 @@ editor_options:
 rm(list=ls())
 ```
 
-```{r, message=FALSE, warning=FALSE}
 ### **Loading Libraries**
+```{r, message=FALSE, warning=FALSE}
 library(here)
 library(janitor)
 library(tidyverse)
@@ -130,15 +130,9 @@ p3 +
 ### Starting the workflow
 
 # Setting up all the necessary files
-use_targets()
+#use_targets()
 ```
 
-### Traget script file
-
-```{r, eval=FALSE}
-tar_target(read_files, file_names)
-tar_target(cleaning_function, parameters)
-```
 
 ### Inspect the workflow
 
@@ -155,6 +149,10 @@ tar_visnetwork()
 ### Run the workflow
 ```{r}
 tar_make()
+```
+
+```{r}
+tar_read(data)
 ```
 
 ### look at the plot (our output in this example)

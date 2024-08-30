@@ -4,11 +4,6 @@
 #   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline
 
 # Load packages required to define the pipeline:
-library(here)
-library(janitor)
-library(tidyverse)
-library(readr)
-library(patchwork)
 library(targets)
 
 
@@ -54,13 +49,10 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
-  file_names <- c("RioMameyesPuenteRoto.csv", 
-                  "QuebradaCuenca1-Bisley.csv",
-                  "QuebradaCuenca2-Bisley.csv",
-                  "QuebradaCuenca3-Bisley.csv"),
-  
-  parameters<-c("Sample_ID",
-                "Sample_Date",
-                "NO3-N",
-                "K")
+  # tar_target(rmp,"/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data/RioMameyesPuenteRoto.csv",format="file"),
+  # tar_target(bq1,"/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data/QuebradaCuenca1-Bisley.csv",format="file"),
+  # tar_target(bq2,"/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data/QuebradaCuenca2-Bisley.csv",format="file"),
+  # tar_target(bq3,"/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data/QuebradaCuenca3-Bisley.csv",format="file"),
+  tar_target(files,file_names),
+  tar_target(target1, read_files(files))
 )
