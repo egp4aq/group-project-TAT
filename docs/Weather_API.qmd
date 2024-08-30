@@ -1,6 +1,7 @@
 ---
-title: "final_proj"
+title: "section2"
 format: html
+editor: visual
 editor_options: 
   chunk_output_type: console
 ---
@@ -17,9 +18,12 @@ library(tidyverse)
 library(readr)
 library(patchwork)
 library(targets)
+library(httr)
+library(jsonlite)
 ```
 
 ### **Read_files Function**
+
 ```{r, message=FALSE, warning=FALSE}
 #Import data from multiple files into R
 read_files <- function(file_names) {
@@ -37,6 +41,7 @@ read_files <- function(file_names) {
 ```
 
 ### **Data Cleaning Function**
+
 ```{r, message=FALSE, warning=FALSE}
 #Process and merge data from all files
 
@@ -57,24 +62,25 @@ cleaning_function<-function(parameters){
 ```
 
 ### **Defining the Parameters**
+
 ```{r, message=FALSE, warning=FALSE}
 #Link to where the data resides
 pathway <- "/courses/EDS214/group_project/2024/tropical-aqua-titans/raw_data"
 
 #Names of files
 file_names <- c("RioMameyesPuenteRoto.csv", 
-                "QuebradaCuenca1-Bisley.csv",
-                "QuebradaCuenca2-Bisley.csv",
-                "QuebradaCuenca3-Bisley.csv")
+                "QuebradaCuenca1-Bisley.csv")
 
 #Define Water Quality Parameters
 parameters<-c("Sample_ID",
               "Sample_Date",
               "NO3-N",
-              "K")
+              "K",
+              "TSS")
 ```
 
 ### **Running the Functions**
+
 ```{r, message=FALSE, warning=FALSE}
 read_files(file_names)
 variables <- ls(pattern = "^data_")
@@ -82,10 +88,11 @@ combined_df<-cleaning_function(parameters)
 ```
 
 ##Section 2 - Graphing the WQ data
+
 ```{r, message=FALSE, warning=FALSE}
 # Filter the data by the specified year range and make column name lower case
 filtered_df <- combined_df %>%
-  filter(year(Sample_Date) > 1988 & year(Sample_Date) < 1991)
+  filter(year(Sample_Date) > 2012 & year(Sample_Date) < 2014)
 
 filtered_df <- clean_names(filtered_df)
 
@@ -93,29 +100,61 @@ filtered_df<-filtered_df%>%
 mutate(across(3:ncol(filtered_df), ~ as.numeric(as.character(.))))
 ```
 
+### Open-Source Historical Weather Data API 
+```{r}
+# Define your coordinates for the location (https://lternet.edu/site/luquillo-lter/)
+latitude <- 18.37165  # Latitude for Luquillo, PR
+longitude <- -65.7193  # Longitude for Luquillo, PR
+
+
+# Define the start and end dates for historical data (YYYY-MM-DD format)
+start_date <- "2013-01-01" 
+end_date <- "2014-01-01"    
+
+# Define the URL for the Open-Meteo API
+url <- paste0("https://archive-api.open-meteo.com/v1/era5?latitude=", latitude,
+              "&longitude=", longitude,
+              "&daily=precipitation_sum",
+              "&start_date=", start_date,
+              "&end_date=", end_date,
+              "&timezone=America%2FNew_York")  # Adjust timezone as needed
+
+# Make the API request
+response <- GET(url)
+weather_data <- fromJSON(content(response, "text"))
+
+# Extract the daily weather data
+daily_data <- weather_data$daily
+
+# Convert to a data frame
+df_weather <- data.frame(
+  date = as.Date(daily_data$time),
+  precipitation_sum = daily_data$precipitation_sum)
+```
+
+
+
 ### **Plotting the data**
+
 ```{r, message=FALSE, warning=FALSE}
 #plot for K
 p1 <- ggplot(filtered_df) +
-  geom_line(aes(sample_date, k, color = sample_id)) +
+  geom_line(aes(sample_date, tss, color = sample_id)) +
   labs(x = "Year",
-       y = "Potassium (mg/l)") +
-  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
+       y = "TSS (mg/l)") +
+  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3"),
                     name = "Location: ",
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
-  geom_vline(xintercept = as.numeric(filtered_df$sample_date[39]), linetype = "dashed") +
+                    labels = c("PRM", "BQ1", "BQ2")) +
   theme_minimal()
 
-# plot for nitrate
-p2 <- ggplot(filtered_df) +
-  geom_line(aes(sample_date, no3_n, color = sample_id)) +
+# Plot the data using ggplot2
+
+# plot for weather
+p2 <- ggplot(df_weather,aes(date, precipitation_sum)) +
+  geom_line(color="navy") +
   labs(x = "Year",
-       y = "Nitrate (ug/l)") +
-  scale_color_manual(values = c("#C0DF85", "#EE85B5", "#90E0F3", "#F39C6B"),
-                    name = "Watershed: ",
-                    labels = c("PRM", "BQ1", "BQ2", "BQ3")) +
-  geom_vline(xintercept = as.numeric(filtered_df$sample_date[39]), linetype = "dashed")  +
-  theme_minimal()
+       y = "Daily Precipitation (mm)") +
+  theme_minimal()# +  geom_vline(xintercept = as.numeric(filtered_df$sample_date[39]), linetype = "dashed") 
 
 # patchwork of both plots
 p3 <- p1/p2
@@ -124,47 +163,3 @@ p3 +
   plot_annotation(title = "Effect of Hurricane Hugo on Stream Water Potassium and Nitrate\n in the Luquillo Mountains") + theme(plot.title=element_text(hjust=0.5)) +
   plot_layout(guides = "collect")
 ```
-
-### **Creating Pipeline**
-```{r, message=FALSE, warning=FALSE}
-### Starting the workflow
-
-# Setting up all the necessary files
-use_targets()
-```
-
-### Traget script file
-
-```{r, eval=FALSE}
-tar_target(read_files, file_names)
-tar_target(cleaning_function, parameters)
-```
-
-### Inspect the workflow
-
-#### List of the various steps
-```{r}
-tar_manifest()
-```
-
-#### visualize
-```{r}
-tar_visnetwork()
-```
-
-### Run the workflow
-```{r}
-tar_make()
-```
-
-### look at the plot (our output in this example)
-```{r}
-tar_read(scatterplot)
-```
-
-### Try to rerun the workflow:
-
-```{r}
-tar_make()
-```
-
